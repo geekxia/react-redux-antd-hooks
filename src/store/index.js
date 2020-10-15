@@ -1,32 +1,21 @@
-import { createStore } from 'redux'
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware
+} from 'redux'
 
-let initState = {
-  msg: 'hello 2006',
-  list: [],
-  foo: true
-}
+import thunk from 'redux-thunk'
 
-// reducer，是一个纯函数
-// state是可被组件共享的状态数据
-// action是改变state的信号（信息）
+import musicReducer from './reducers/music'
+import todoReducer from './reducers/todo'
+import studyReducer from './reducers/study'
 
-// JSON.parse(JSON.stringify())
-// Object.assign()
-// {...{}}
-
-function reducer(state=initState, action) {
-  // console.log('----------', action)
-  // 深复制（副本、快照）
-  let newState = JSON.parse(JSON.stringify(state))
-  switch (action.type) {
-    case 1:
-      newState.msg = action.payload
-      return newState
-    default:
-      return newState
-  }
-}
+const rootReducer = combineReducers({
+  study: studyReducer,
+  music: musicReducer,
+  todo: todoReducer
+})
 
 // 存储数据的中心
-const store = createStore(reducer)
+const store = createStore(rootReducer, applyMiddleware(thunk))
 export default store
