@@ -1,3 +1,8 @@
+import {
+  CHANGE_MSG,
+  GET_QQ_MUSIC
+} from '../actions'
+
 let initState = {
   msg: 'hello 2006',
   list: [],
@@ -17,13 +22,10 @@ export default function reducer(state=initState, action) {
   // 深复制（副本、快照）
   let newState = JSON.parse(JSON.stringify(state))
   switch (action.type) {
-    case 1:
+    case CHANGE_MSG:
       newState.msg = action.payload
       return newState
-    case 2:
-      newState.msg = action.payload
-      return newState
-    case 3:
+    case GET_QQ_MUSIC:
       newState.list = action.payload
       return newState
     default:

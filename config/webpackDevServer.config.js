@@ -9,12 +9,12 @@ const redirectServedPath = require('react-dev-utils/redirectServedPathMiddleware
 const paths = require('./paths');
 const getHttpsConfig = require('./getHttpsConfig');
 
-const myProxy = require('../src/utils/proxy')
-
 const host = process.env.HOST || '0.0.0.0';
 const sockHost = process.env.WDS_SOCKET_HOST;
 const sockPath = process.env.WDS_SOCKET_PATH; // default: '/sockjs-node'
 const sockPort = process.env.WDS_SOCKET_PORT;
+
+const myProxy = require('../react.config')
 
 module.exports = function(proxy, allowedHost) {
   return {
@@ -105,7 +105,14 @@ module.exports = function(proxy, allowedHost) {
     },
     public: allowedHost,
     // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
-    proxy: myProxy,
+    // proxy: {
+    //   '/soso': {
+    //     target: 'https://c.y.qq.com',
+    //     changeOrigin: true
+    //   }
+    // },
+    // proxy: myProxy,
+    proxy,
     before(app, server) {
       // Keep `evalSourceMapMiddleware` and `errorOverlayMiddleware`
       // middlewares before `redirectServedPath` otherwise will not have any effect
@@ -116,7 +123,7 @@ module.exports = function(proxy, allowedHost) {
 
       if (fs.existsSync(paths.proxySetup)) {
         // This registers user provided middleware for proxy reasons
-        require(paths.proxySetup)(app);
+        require(paths.proxySetup)(app)
       }
     },
     after(app) {

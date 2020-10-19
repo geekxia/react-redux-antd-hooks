@@ -4,16 +4,15 @@ import {
   applyMiddleware
 } from 'redux'
 
+// 解决redux不支持异步生成action的天生缺陷
 import thunk from 'redux-thunk'
 
-import musicReducer from './reducers/music'
-import todoReducer from './reducers/todo'
-import studyReducer from './reducers/study'
+import studyReducer from './reducers/studyReducer'
+import goodReducer from './reducers/goodReducer'
 
 const rootReducer = combineReducers({
   study: studyReducer,
-  music: musicReducer,
-  todo: todoReducer
+  good: goodReducer
 })
 
 // 存储数据的中心

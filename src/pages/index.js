@@ -5,11 +5,13 @@ import {
   AppstoreOutlined
 } from '@ant-design/icons';
 
-const TestRedux = loadable(()=>import('./test_redux/TestRedux'))
-const TestReduxHook = loadable(()=>import('./test_redux/TestReduxHook'))
+const TestRedux = loadable(()=>import('./home/TestRedux'))
+const TestReduxHook = loadable(()=>import('./home/TestReduxHook'))
+
 
 const GoodList = loadable(()=>import('./good/GoodList'))
 const GoodDetail = loadable(()=>import('./good/GoodDetail'))
+
 
 const routes = [
   {
@@ -27,7 +29,7 @@ const routes = [
         id: 902,
         path: '/redux/hook',
         component: TestReduxHook,
-        text: 'ReduxHook'
+        text: 'TestReduxHook'
       }
     ]
   },
@@ -44,7 +46,7 @@ const routes = [
         children: [
           {
             id: 100101,
-            path: '/good/detail',
+            path: '/good/detail/:id',
             component: GoodDetail,
             text: '商品详情'
           }
