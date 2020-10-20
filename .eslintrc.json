@@ -1,0 +1,8 @@
+{
+  "parser": "babel-eslint",
+  "rules": {
+    "react-hooks/exhaustive-deps": 0,
+    "eqeqeq": "off",
+    "no-unused-vars": 0
+  }
+}

@@ -1,13 +1,16 @@
 import {
   fetchQQ,
   fetchCate,
-  fetchGoodList
+  fetchGoodList,
+  fetchGoodDetail
 } from '@/utils/api'
 
 export const CHANGE_MSG = 'CHANGE_MSG'
 export const GET_QQ_MUSIC = 'GET_QQ_MUSIC'
 export const GET_ALL_CATES = 'GET_ALL_CATES'
 export const GET_GOOD_LIST = 'GET_GOOD_LIST'
+export const GET_GOOD_INFO = 'GET_GOOD_INFO'
+export const CLEAR_GOOD_INFO = 'CLEAR_GOOD_INFO'
 
 // action生成器
 // action不是函数，action实际上是一个 plain object
@@ -55,6 +58,7 @@ export function getCatesActions(params) {
   }
 }
 
+// 商品列表
 export function getGoodListAction(params) {
   return dispatch=>{
     fetchGoodList(params).then(res=>{
@@ -63,5 +67,23 @@ export function getGoodListAction(params) {
         payload: res
       })
     })
+  }
+}
+
+// 商品详情
+export function getGoodInfoAction(params) {
+  return dispatch=>{
+    fetchGoodDetail(params).then(res=>{
+      dispatch({
+        type: GET_GOOD_INFO,
+        payload: res
+      })
+    })
+  }
+}
+export function goodInfoClearAction() {
+  return {
+    type: CLEAR_GOOD_INFO,
+    payload: {}
   }
 }

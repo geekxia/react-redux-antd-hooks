@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+
+import { useSelector, useDispatch } from 'react-redux'
 
 import {
   Form,
@@ -12,6 +14,7 @@ import {
 import { QfCateSelect } from '@/components'
 import img from '@/utils/img'
 import { fetchGoodAdd } from '@/utils/api'
+import { getGoodInfoAction, goodInfoClearAction } from '@/store/actions'
 
 const { TextArea } = Input
 
@@ -20,6 +23,9 @@ export default function GoodList(props) {
   const [form] = Form.useForm()
 
   const [imageUrl, setImageUrl] = useState('')
+  const [count, setCount] = useState(0)
+
+  const goodInfo = useSelector(store=>store.good.goodInfo)
 
   const formItemLayout = {
     labelCol: {
@@ -43,6 +49,7 @@ export default function GoodList(props) {
     console.log('图片上传成功', e)
     if(e.file && e.file.response) {
       setImageUrl(e.file.response.data.url)
+      console.log('imageUrl', imageUrl)
     }
   }
 
@@ -50,11 +57,30 @@ export default function GoodList(props) {
   // 表单验证成功并提交
   const onFinish = values => {
     console.log('提交', values)
-    fetchGoodAdd({...values, img: imageUrl}).then(()=>{
+    const data = {...values, img: imageUrl}
+    if(id!=0) {
+      data.id = goodInfo._id
+    }
+    fetchGoodAdd(data).then(()=>{
       props.history.replace('/good/list')
+      // 清空redux中的商品详情数据
+      dispatch(goodInfoClearAction())
     })
   }
 
+  const dispatch = useDispatch()
+  let id = props.match.params.id
+  useEffect(()=>{
+    if(id!=0) {
+      dispatch(getGoodInfoAction({good_id: id}))
+    }
+  },[])
+  useEffect(()=>{
+    // 设置表单的初始值
+    form.setFieldsValue(goodInfo)
+  })
+
+  console.log('info', goodInfo)
 
   return (
     <div>
@@ -65,9 +91,7 @@ export default function GoodList(props) {
           form={form}
           name="good"
           onFinish={onFinish}
-          initialValues={{
-            test: 'hello text form'
-          }}
+          initialValues={goodInfo}
           scrollToFirstError
         >
           <Form.Item
@@ -128,9 +152,7 @@ export default function GoodList(props) {
           </Form.Item>
 
           <Form.Item
-            // name="img"
             label="商品图片"
-            // valuePropName='fileList'
             rules={
               [
                 { required: true, message: '图片是必填的' }
@@ -145,7 +167,7 @@ export default function GoodList(props) {
               onChange={imgChange}
             >
               <img
-                src={imageUrl ? img.imgBaseUrl+imageUrl : img.uploadIcon}
+                src={imageUrl ? img.imgBaseUrl+imageUrl : (goodInfo.img ? img.imgBaseUrl+goodInfo.img : img.uploadIcon)}
                 alt="avatar"
                 style={{ width: '100%' }}
               />
@@ -162,7 +184,7 @@ export default function GoodList(props) {
 
           <Form.Item {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit">
-              添加商品
+              {props.match.params.id==0 ? '添加商品' : '确认修改'}
             </Button>
           </Form.Item>
         </Form>

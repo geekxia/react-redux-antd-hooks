@@ -44,7 +44,7 @@ export default function GoodList(props) {
     // 触发
     dispatch(getGoodListAction(filter))
     return undefined
-  }, [])
+  }, [filter])
 
   const columns = [
     {
@@ -97,7 +97,12 @@ export default function GoodList(props) {
       key: '_id',
       render: (text, row) => (
         <Space size="middle">
-          <span className='qf-table-edit'>编辑</span>
+          <span
+            className='qf-table-edit'
+            onClick={()=>props.history.push('/good/detail/'+row._id)}
+          >
+            编辑
+          </span>
           <span
             className='qf-table-del'
             onClick={()=>deleteHandle(row)}
@@ -130,7 +135,7 @@ export default function GoodList(props) {
     if(key!=='page') filter.page = 1
     setFilter(JSON.parse(JSON.stringify(filter)))
     // 调接口更新表格
-    dispatch(getGoodListAction(filter))
+    // dispatch(getGoodListAction(filter))
   }
 
   // modal

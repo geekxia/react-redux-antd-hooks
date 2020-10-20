@@ -44,3 +44,12 @@ export function fetchGoodDel(params) {
     method: 'GET'
   })
 }
+
+// 商品详情
+export function fetchGoodDetail(params) {
+  return axios({
+    url: '/jd/good/detail',
+    params,
+    method: 'GET'
+  })
+}
