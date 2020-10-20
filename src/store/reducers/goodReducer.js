@@ -1,10 +1,12 @@
 import {
-  GET_ALL_CATES
+  GET_ALL_CATES,
+  GET_GOOD_LIST
 } from '../actions'
 
 let initState = {
   msg: 'hello good',
-  cateList: []
+  cateList: [],
+  good: {}
 }
 
 export default function reducer(state=initState, action) {
@@ -12,6 +14,9 @@ export default function reducer(state=initState, action) {
   switch (action.type) {
     case GET_ALL_CATES:
       newState.cateList = action.payload
+      return newState
+    case GET_GOOD_LIST:
+      newState.good = action.payload
       return newState
     default:
       return newState

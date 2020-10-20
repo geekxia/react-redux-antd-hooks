@@ -4,9 +4,9 @@ const { createProxyMiddleware } = require('http-proxy-middleware')
 
 module.exports = function(app) {
   app.use(
-    '/soso',
+    '/api',
     createProxyMiddleware({
-      target: 'https://c.y.qq.com',
+      target: 'http://localhost:9000',
       changeOrigin: true,
     })
   );

@@ -1,11 +1,13 @@
 import {
   fetchQQ,
-  fetchCate
+  fetchCate,
+  fetchGoodList
 } from '@/utils/api'
 
 export const CHANGE_MSG = 'CHANGE_MSG'
 export const GET_QQ_MUSIC = 'GET_QQ_MUSIC'
 export const GET_ALL_CATES = 'GET_ALL_CATES'
+export const GET_GOOD_LIST = 'GET_GOOD_LIST'
 
 // action生成器
 // action不是函数，action实际上是一个 plain object
@@ -40,13 +42,24 @@ export function getQqMusicAction(params) {
   }
 }
 
-// 从public中获取cates品类假数据
+// 获取品类列表
 export function getCatesActions(params) {
   return dispatch=>{
     fetchCate(params).then(res=>{
       console.log('-----', res)
       dispatch({
         type: GET_ALL_CATES,
+        payload: res.list
+      })
+    })
+  }
+}
+
+export function getGoodListAction(params) {
+  return dispatch=>{
+    fetchGoodList(params).then(res=>{
+      dispatch({
+        type: GET_GOOD_LIST,
         payload: res
       })
     })

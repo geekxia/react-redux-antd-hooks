@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { getCatesActions } from '@/store/actions'
-import { useSelector, useDispatch } from 'react-redux'
+import { QfCateSelect } from '@/components'
 
 import {
   Table,
@@ -9,138 +8,150 @@ import {
   Row,
   Col,
   DatePicker,
-  Select,
-  Button
+  Button,
+  Modal
 } from 'antd'
 
+import { getGoodListAction } from '@/store/actions'
+import { useSelector, useDispatch } from 'react-redux'
+
+import img from '@/utils/img'
+import './style.scss'
+import { fetchGoodDel } from '@/utils/api'
+
+import moment from 'moment'
+
 const { RangePicker } = DatePicker
-const { Option } = Select
+
 
 export default function GoodList(props) {
 
-  const initFilter = {
-    date: [],
+  const good = useSelector(store=>store.good.good)
+
+  const [visible, setVisible] = useState(false)
+  const [curRow, setCurRow] = useState({})
+
+  const [filter, setFilter] = useState({
+    dates: [],
     cate: '',
     page: 1,
-    size: 10
-  }
+    size: 2
+  })
 
-  const [filter, setFilter] = useState(initFilter)
+  // 页面初始化、调接口
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    // 触发
+    dispatch(getGoodListAction(filter))
+    return undefined
+  }, [])
 
   const columns = [
     {
-      title: 'Name',
+      title: '商品',
       dataIndex: 'name',
       key: 'name',
-      render: text => <span>{text}</span>,
+      align: 'center',
+      render: (name, row) => {
+        return (
+          <div className='good-img'>
+            <img src={img.imgBaseUrl+row.img} alt={name} />
+            <div>{name}</div>
+          </div>
+        )
+      },
     },
     {
-      title: 'Age',
-      dataIndex: 'age',
-      key: 'age',
-      render: age => <span>{age*100}</span>
+      title: '描述',
+      dataIndex: 'desc',
+      width: 150,
+      key: 'desc',
+      align: 'center'
+      // render: age => <span>{age*100}</span>
     },
     {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: '价格',
+      dataIndex: 'price',
+      key: 'price',
+      align: 'center',
+      render: price => <span>{'￥'+price}</span>
     },
     {
-      title: 'Tags',
-      key: 'tags',
-      dataIndex: 'tags',
-      render: tags => (
-        <>
-          {tags.map(tag => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
+      title: '上线时间',
+      key: 'create_time',
+      dataIndex: 'create_time',
+      align: 'center',
+      render: time => {
+        let m = moment(time)
+        return(
+          <>
+            <div>{m.format('YYYY年MM月DD日')}</div>
+            <div>{m.format('HH时mm分ss秒')}</div>
+          </>
+        )
+      }
     },
     {
-      title: 'Action',
-      key: 'action',
-      render: (text, record) => (
+      title: '操作',
+      align: 'center',
+      key: '_id',
+      render: (text, row) => (
         <Space size="middle">
-          <span>Invite {record.name}</span>
-          <span>Delete</span>
+          <span className='qf-table-edit'>编辑</span>
+          <span
+            className='qf-table-del'
+            onClick={()=>deleteHandle(row)}
+          >
+            删除
+          </span>
         </Space>
       ),
     },
-  ];
-
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher'],
-    },
   ]
 
-  // 状态管理
-  const cateList = useSelector(store=>store.good.cateList)
-  const dispatch = useDispatch()
 
-  useEffect(()=>{
-    dispatch(getCatesActions({}))
-  }, [])
 
-  console.log('cateList', cateList)
+  // 日期筛选【moment】的使用
+  // let sTime = dates[0].format('YYYY-MM-DD HH:mm:ss')
+  // let eTime = dates[1].valueOf()
 
-  // 日期筛选
-  const dateChange = (dates)=>{
-    if (dates) {
-      console.log('dates', dates)
-      let sTime = dates[0].format('YYYY-MM-DD HH:mm:ss')
-      console.log('sTime', sTime)
-      let eTime = dates[1].valueOf()
-      console.log('eTime', eTime)
+  const filterChange = (key, e) => {
+    switch (key) {
+      case 'dates':
+        e = e || []
+        break
+      case 'cate':
+        e = e || ''
+        break
+      default:
     }
+    filter[key] = e
+    // 当表格上方的筛选条件发生变化时，一定要把page重置成1
+    if(key!=='page') filter.page = 1
+    setFilter(JSON.parse(JSON.stringify(filter)))
+    // 调接口更新表格
+    dispatch(getGoodListAction(filter))
   }
-  // 品类变化
-  const cateChange = val => {
-    console.log('cate', val)
-    // let newFilter = filter  // 浅复制
-    // newFilter.cate = val
-    // filter.cate = val
-    // setCate(val)
-    initFilter.cate = val
-    setFilter(initFilter)
+
+  // modal
+  const deleteHandle = row => {
+    setVisible(true)
+    setCurRow(row)
   }
-  const pageChange = page => {
-    // filter.page = page
-    // setFilter(JSON.parse(JSON.stringify(filter)))
-    initFilter.page = page
-    setFilter(initFilter)
-    console.log('filter', filter)
+  const modalHandle = type => {
+    if(type==='ok') {
+      // 调接口删除商品
+      fetchGoodDel({id: curRow._id}).then(()=>{
+        dispatch(getGoodListAction(filter))
+        setVisible(false)
+      })
+    }else{
+      setVisible(false)
+    }
   }
 
   return (
-    <div>
+    <div className='qf-good-list'>
       <h1>商品列表</h1>
       <div style={{padding:'20px 0'}}>
         <Row align='middle'>
@@ -148,20 +159,19 @@ export default function GoodList(props) {
             <span className='qf-key'>时间:</span>
           </Col>
           <Col span={7}>
-            <RangePicker onChange={dateChange}/>
+            <RangePicker
+              onChange={(e)=>filterChange('dates', e)}
+            />
           </Col>
           <Col span={2}>
             <span className='qf-key'>品类:</span>
           </Col>
           <Col span={4}>
-            <Select value={filter.cate} allowClear style={{width:'100px'}} onChange={cateChange}>
-              <Option value=''>全部</Option>
-              {
-                cateList.map(ele=>(
-                  <Option key={ele.id} value={ele.cate}>{ele.cate_zh}</Option>
-                ))
-              }
-            </Select>
+            <QfCateSelect
+              value={filter.cate}
+              onChange={(e)=>filterChange('cate', e)}
+              hasAll
+            />
           </Col>
           <Col offset={7} span={2}>
             <div className='qf-key' style={{paddingRight: '0'}}>
@@ -173,19 +183,31 @@ export default function GoodList(props) {
       <div>
         <Table
           columns={columns}
-          dataSource={data}
+          rowKey='_id'
+          dataSource={good.list}
           pagination={{
             pageSize: 2,
-            onChange: pageChange,
+            current: filter.page,
+            onChange: e=>filterChange('page', e),
             showQuickJumper: true,
             showSizeChanger: true,
             pageSizeOptions: [1,2,3,5,10],
-            showTotal: (total)=>{
-              return <h1>总共 {total} 条</h1>
-            }
+            showTotal: ()=>{
+              return <h1>总共 {good.total} 条</h1>
+            },
+            total: good.total
           }}
         />
       </div>
+
+      <Modal
+          title="警告"
+          visible={visible}
+          onOk={()=>modalHandle('ok')}
+          onCancel={()=>modalHandle('no')}
+        >
+          <div>你确定要删除 <span style={{color: 'red'}}>{curRow.name}</span> 这个宝贵的商品吗？</div>
+      </Modal>
     </div>
   )
 }
