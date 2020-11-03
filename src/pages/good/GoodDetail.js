@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Form,
@@ -14,42 +13,48 @@ import {
 import { QfCateSelect } from '@/components'
 import img from '@/utils/img'
 import { fetchGoodAdd } from '@/utils/api'
-import { getGoodInfoAction, goodInfoClearAction } from '@/store/actions'
+import { getGoodDetailAction } from '@/store/actions'
 
 const { TextArea } = Input
 
-export default function GoodList(props) {
+const formItemLayout = {
+  labelCol: { sm: { span: 4 }},
+  wrapperCol: { sm: { span: 20 }}
+}
+const tailFormItemLayout = {
+  wrapperCol: {sm: { span: 20, offset: 4,}}
+}
+
+export default function GoodDetail(props) {
 
   const [form] = Form.useForm()
 
   const [imageUrl, setImageUrl] = useState('')
-  const [count, setCount] = useState(0)
+  const [flag, setFlag] = useState(false)
+  const info = useSelector(store=>store.good.info)
 
-  const goodInfo = useSelector(store=>store.good.goodInfo)
+  const id = props.match.params.id
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    // 当是“编辑”时触发action
+    if(id!=0) {
+      dispatch(getGoodDetailAction({id}))
+    }
+    return undefined
+  },[])
 
-  const formItemLayout = {
-    labelCol: {
-      sm: { span: 4 },
-    },
-    wrapperCol: {
-      sm: { span: 20 },
-    },
-  }
-
-  const tailFormItemLayout = {
-    wrapperCol: {
-      sm: {
-        span: 20,
-        offset: 4,
-      },
-    },
-  }
+  useEffect(()=>{
+    // 用于给Form表单赋初始值
+    if(!flag) {
+      if(id!=0) form.setFieldsValue(info)
+      if(info._id) setFlag(true)
+    }
+  })
 
   const imgChange = (e) => {
     console.log('图片上传成功', e)
     if(e.file && e.file.response) {
       setImageUrl(e.file.response.data.url)
-      console.log('imageUrl', imageUrl)
     }
   }
 
@@ -57,41 +62,28 @@ export default function GoodList(props) {
   // 表单验证成功并提交
   const onFinish = values => {
     console.log('提交', values)
-    const data = {...values, img: imageUrl}
-    if(id!=0) {
-      data.id = goodInfo._id
-    }
+    let data = {...values, img: imageUrl || info.img}
+    if(id!=0) data.id = id
+    // 有id时是编辑，没有id时是新增
     fetchGoodAdd(data).then(()=>{
       props.history.replace('/good/list')
-      // 清空redux中的商品详情数据
-      dispatch(goodInfoClearAction())
     })
   }
 
-  const dispatch = useDispatch()
-  let id = props.match.params.id
-  useEffect(()=>{
-    if(id!=0) {
-      dispatch(getGoodInfoAction({good_id: id}))
-    }
-  },[])
-  useEffect(()=>{
-    // 设置表单的初始值
-    form.setFieldsValue(goodInfo)
-  })
-
-  console.log('info', goodInfo)
+  console.log('商品详情', info)
 
   return (
     <div>
-      <h1>商品{props.match.params.id==0 ? '新增' : '编辑'}</h1>
+      <h1>商品{id==0 ? '新增' : '编辑'}</h1>
       <div style={{width: '60%', margin:'35px 0'}}>
         <Form
           {...formItemLayout}
           form={form}
           name="good"
           onFinish={onFinish}
-          initialValues={goodInfo}
+          initialValues={{
+            test: 'hello text form'
+          }}
           scrollToFirstError
         >
           <Form.Item
@@ -152,7 +144,9 @@ export default function GoodList(props) {
           </Form.Item>
 
           <Form.Item
+            // name="img"
             label="商品图片"
+            // valuePropName='fileList'
             rules={
               [
                 { required: true, message: '图片是必填的' }
@@ -167,7 +161,7 @@ export default function GoodList(props) {
               onChange={imgChange}
             >
               <img
-                src={imageUrl ? img.imgBaseUrl+imageUrl : (goodInfo.img ? img.imgBaseUrl+goodInfo.img : img.uploadIcon)}
+                src={imageUrl ? img.imgBaseUrl+imageUrl : (info.img ? img.imgBaseUrl+info.img : img.uploadIcon)}
                 alt="avatar"
                 style={{ width: '100%' }}
               />
@@ -184,7 +178,7 @@ export default function GoodList(props) {
 
           <Form.Item {...tailFormItemLayout}>
             <Button type="primary" htmlType="submit">
-              {props.match.params.id==0 ? '添加商品' : '确认修改'}
+              {id==0 ? "添加商品" : "确认修改"}
             </Button>
           </Form.Item>
         </Form>

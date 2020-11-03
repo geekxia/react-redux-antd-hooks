@@ -7,6 +7,8 @@ import {
 
 const TestRedux = loadable(()=>import('./home/TestRedux'))
 const TestReduxHook = loadable(()=>import('./home/TestReduxHook'))
+const TestChat = loadable(()=>import('./home/TestChat'))
+const TestEchart = loadable(()=>import('./home/TestEchart'))
 
 
 const GoodList = loadable(()=>import('./good/GoodList'))
@@ -30,6 +32,18 @@ const routes = [
         path: '/redux/hook',
         component: TestReduxHook,
         text: 'TestReduxHook'
+      },
+      {
+        id: 903,
+        path: '/chat',
+        component: TestChat,
+        text: '聊天室'
+      },
+      {
+        id: 904,
+        path: '/echart',
+        component: TestEchart,
+        text: '可视化技术'
       }
     ]
   },

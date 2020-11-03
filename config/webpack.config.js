@@ -337,8 +337,9 @@ module.exports = function(webpackEnv) {
                 formatter: require.resolve('react-dev-utils/eslintFormatter'),
                 eslintPath: require.resolve('eslint'),
                 resolvePluginsRelativeTo: __dirname,
-                // useEslintrc: true
-                configFile: path.resolve(__dirname, '../.eslintrc.json')
+                // 手动指定eslint的配置文件，因为create-react-app默认不使用eslint的配置文件
+                configFile: path.resolve(__dirname, '../.eslintrc.json'),
+                useEslintrc: true
               },
               loader: require.resolve('eslint-loader'),
             },

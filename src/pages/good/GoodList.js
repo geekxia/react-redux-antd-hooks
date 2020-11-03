@@ -12,7 +12,7 @@ import {
   Modal
 } from 'antd'
 
-import { getGoodListAction } from '@/store/actions'
+import { getGoodListAction, getClearInfoAction } from '@/store/actions'
 import { useSelector, useDispatch } from 'react-redux'
 
 import img from '@/utils/img'
@@ -27,6 +27,7 @@ const { RangePicker } = DatePicker
 export default function GoodList(props) {
 
   const good = useSelector(store=>store.good.good)
+  const cateArr = useSelector(store=>store.good.cateList)
 
   const [visible, setVisible] = useState(false)
   const [curRow, setCurRow] = useState({})
@@ -46,12 +47,19 @@ export default function GoodList(props) {
     return undefined
   }, [filter])
 
+  const skipToDetail = () => {
+    // 清空redux中的商品详情
+    dispatch(getClearInfoAction())
+    props.history.push('/good/detail/0')
+  }
+
   const columns = [
     {
       title: '商品',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
+      fixed: true,
       render: (name, row) => {
         return (
           <div className='good-img'>
@@ -70,11 +78,30 @@ export default function GoodList(props) {
       // render: age => <span>{age*100}</span>
     },
     {
+      title: '品类',
+      dataIndex: 'cate',
+      key: 'cate',
+      align: 'center',
+      render: cate=>{
+        let arr = cateArr.filter(ele=>ele.cate===cate)
+        return <span>{arr[0].cate_zh}</span>
+      }
+    },
+    {
       title: '价格',
       dataIndex: 'price',
       key: 'price',
       align: 'center',
-      render: price => <span>{'￥'+price}</span>
+      render: price => <span>{'￥'+price}</span>,
+      defaultSortOrder: 'descend',
+      sorter: (a, b) => a.price - b.price
+    },
+    {
+      title: '是否热销',
+      dataIndex: 'hot',
+      key: 'hot',
+      align: 'center',
+      render: hot=><span>{hot?'是':'否'}</span>
     },
     {
       title: '上线时间',
@@ -134,8 +161,6 @@ export default function GoodList(props) {
     // 当表格上方的筛选条件发生变化时，一定要把page重置成1
     if(key!=='page') filter.page = 1
     setFilter(JSON.parse(JSON.stringify(filter)))
-    // 调接口更新表格
-    // dispatch(getGoodListAction(filter))
   }
 
   // modal
@@ -180,7 +205,7 @@ export default function GoodList(props) {
           </Col>
           <Col offset={7} span={2}>
             <div className='qf-key' style={{paddingRight: '0'}}>
-              <Button type='primary' onClick={()=>props.history.push('/good/detail/0')}>新增</Button>
+              <Button type='primary' onClick={skipToDetail}>新增</Button>
             </div>
           </Col>
         </Row>

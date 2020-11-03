@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // 全局的样式文件
 import '@/assets/css/app.scss'
@@ -11,14 +11,24 @@ import { HashRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import store from '@/store'
 
-import { QfLayout } from '@/components'
+import { QfLayout, QfLogin } from '@/components'
 
 function App() {
+
+  let token = localStorage.getItem('token')
+
+  const [isLogin, setIsLogin] = useState(token)
+  const login = () => {
+    setIsLogin(true)
+  }
+
   return (
     <HashRouter>
       <Provider store={store}>
         <div className="app">
-          <QfLayout />
+          {
+            isLogin ? <QfLayout /> : <QfLogin onLogin={login} />
+          }
         </div>
       </Provider>
     </HashRouter>

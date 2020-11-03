@@ -53,3 +53,12 @@ export function fetchGoodDetail(params) {
     method: 'GET'
   })
 }
+
+// 登录
+export function fetchLogin(data) {
+  return axios({
+    url: '/user/login',
+    method: 'POST',
+    data
+  })
+}

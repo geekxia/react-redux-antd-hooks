@@ -66,13 +66,15 @@
     "@ant-design/icons": "^4.2.2",
     "antd": "^4.7.0",
     "axios": "^0.20.0",
+    "echarts": "^4.9.0",
     "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "socket.io-client": "^2.3.1"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -80,7 +82,10 @@
     "test": "node scripts/test.js"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "react-app",
+    "rules": {
+      "react-hooks/exhaustive-deps": "off"
+    }
   },
   "browserslist": {
     "production": [
